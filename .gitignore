@@ -1,5 +1,5 @@
-config.yaml
-state.db
+/config.yaml
+/state.db
 __pycache__/
 *.pyc
 .venv/
