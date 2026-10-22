@@ -1,0 +1,25 @@
+{
+  "products": [
+    {
+      "id": "cross-ring",
+      "name": "Cross Ring (Silver)",
+      "url": "https://example.com/products/cross-ring",
+      "status": "out_of_stock",
+      "price": "$450"
+    },
+    {
+      "id": "horseshoe-hoodie",
+      "name": "Horseshoe Hoodie (Black, M)",
+      "url": "https://example.com/products/horseshoe-hoodie",
+      "status": "out_of_stock",
+      "price": "$1,200"
+    },
+    {
+      "id": "trucker-cap",
+      "name": "Trucker Cap",
+      "url": "https://example.com/products/trucker-cap",
+      "status": "in_stock",
+      "price": "$350"
+    }
+  ]
+}
