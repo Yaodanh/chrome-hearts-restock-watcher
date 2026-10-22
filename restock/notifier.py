@@ -17,14 +17,15 @@ class Notifier(Protocol):
         ...
 
 
-def build_message(alerts: List[Alert], sender: str, recipient: str) -> EmailMessage:
+def build_message(alerts: List[Alert], sender: str, recipient: str,
+                  subject_tag: str = "Chrome Hearts") -> EmailMessage:
     events = [e for e in ORDER if any(a.event is e for a in alerts)]
     headline = events[0].value
     names = ", ".join(a.item.name for a in alerts if a.item.kind == "product") or \
         ", ".join(a.item.name for a in alerts)
 
     msg = EmailMessage()
-    msg["Subject"] = f"[Chrome Hearts] {headline}: {names}"[:150]
+    msg["Subject"] = f"[{subject_tag}] {headline}: {names}"[:150]
     msg["From"] = sender
     msg["To"] = recipient
 
@@ -46,16 +47,18 @@ class EmailNotifier:
     """SMTP over SSL. Works with Gmail (app password) or 163 mail (authorization code)."""
 
     def __init__(self, host: str, port: int, username: str, password: str,
-                 sender: str, recipient: str, smtp_factory=smtplib.SMTP_SSL):
+                 sender: str, recipient: str, smtp_factory=smtplib.SMTP_SSL,
+                 subject_tag: str = "Chrome Hearts"):
         self.host, self.port = host, port
         self.username, self.password = username, password
         self.sender, self.recipient = sender, recipient
         self.smtp_factory = smtp_factory
+        self.subject_tag = subject_tag
 
     def send(self, alerts: List[Alert]) -> None:
         if not alerts:
             return
-        msg = build_message(alerts, self.sender, self.recipient)
+        msg = build_message(alerts, self.sender, self.recipient, self.subject_tag)
         with self.smtp_factory(self.host, self.port, timeout=30) as smtp:
             smtp.login(self.username, self.password)
             smtp.send_message(msg)
@@ -65,7 +68,10 @@ class EmailNotifier:
 class ConsoleNotifier:
     """Prints the email instead of sending it (dry run / demo)."""
 
+    def __init__(self, subject_tag: str = "Chrome Hearts"):
+        self.subject_tag = subject_tag
+
     def send(self, alerts: List[Alert]) -> None:
         if not alerts:
             return
-        print(build_message(alerts, "restock-watcher", "you").as_string())
+        print(build_message(alerts, "restock-watcher", "you", self.subject_tag).as_string())

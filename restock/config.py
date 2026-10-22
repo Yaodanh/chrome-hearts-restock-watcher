@@ -66,9 +66,11 @@ def build_source(cfg: dict):
 
 
 def build_notifier(cfg: dict, dry_run: bool):
-    if dry_run:
-        return ConsoleNotifier()
     email = dict(cfg.get("email") or {})
+    # Subject prefix, e.g. "DEMO - Chrome Hearts" for demo runs.
+    subject_tag = email.get("subject_tag", "Chrome Hearts")
+    if dry_run:
+        return ConsoleNotifier(subject_tag)
     # EMAIL_ADDRESS (e.g. from a GitHub secret) keeps your address out of a public repo.
     address = os.environ.get("EMAIL_ADDRESS", "").strip()
     if address:
@@ -96,4 +98,5 @@ def build_notifier(cfg: dict, dry_run: bool):
         password=password,
         sender=email.get("sender", email["username"]),
         recipient=email["recipient"],
+        subject_tag=subject_tag,
     )

@@ -41,6 +41,13 @@ Public repositories get Actions minutes for free.
    The first run records a baseline (no email). Open the run's log to check that
    categories show `in_stock` / `out_of_stock`, not all `unknown`.
 
+Run workflow options:
+
+- **Only send a test email**: checks your email settings.
+- **Demo: replay a fake restock**: runs `demo/run.sh` with mock data, so a real
+  alert email marked `[DEMO - Chrome Hearts]` arrives in about a minute. It uses its
+  own state file in `demo/`, so real monitoring isn't affected.
+
 Good to know:
 
 - GitHub's scheduler can start runs several minutes late when it's busy.
@@ -68,6 +75,8 @@ export SMTP_PASSWORD='your-app-password'
 .venv/bin/python -m restock --once --dry-run      # one check, print instead of email
 .venv/bin/python -m unittest discover -s tests -v # run the tests
 ```
+
+Offline demo (prints the email instead of sending): `demo/run.sh --dry-run`.
 
 Demo without internet: set `source.type: mock` in `config.yaml`, run once, change a
 product in `data/mock_stock.json` to `in_stock`, and run again.

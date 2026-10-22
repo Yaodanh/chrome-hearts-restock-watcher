@@ -11,6 +11,10 @@ on:
         description: "Only send a test email (checks your email settings)"
         type: boolean
         default: false
+      demo:
+        description: "Demo: replay a fake restock and send a real [DEMO] alert email"
+        type: boolean
+        default: false
 
 # Never run two checks at once; a late run just waits for the previous one.
 concurrency:
@@ -54,8 +58,16 @@ jobs:
           cp config.example.yaml config.yaml
           python -m restock --test-email
 
+      - name: Demo - replay a fake restock
+        if: ${{ inputs.demo && !inputs.test_email }}
+        env:
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+          ALERT_TO: ${{ secrets.ALERT_TO }}
+        run: demo/run.sh
+
       - name: Check the store
-        if: ${{ !inputs.test_email }}
+        if: ${{ !inputs.test_email && !inputs.demo }}
         env:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}

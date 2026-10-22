@@ -8,7 +8,7 @@ from unittest import mock
 import requests
 
 from restock.__main__ import SiteUnreachable, run_once
-from restock.config import ConfigError, build_notifier
+from restock.config import ConfigError, build_notifier, load_config
 from restock.catalog import CatalogSource, category_paths_in, category_status, product_urls_on_page
 from restock.detector import find_alerts
 from restock.http import PoliteClient
@@ -190,6 +190,14 @@ class EmailTests(unittest.TestCase):
         self.assertIn("New product", sent["Subject"])
         self.assertEqual(sent["To"], "me@test")
 
+    def test_subject_tag_marks_demo_emails(self):
+        smtp = mock.MagicMock()
+        n = EmailNotifier("h", 465, "u", "p", "s", "r", smtp_factory=mock.Mock(return_value=smtp),
+                          subject_tag="DEMO - Chrome Hearts")
+        n.send(find_alerts({"a": S.OUT_OF_STOCK}, [snap("a", S.IN_STOCK, "Ring")]))
+        sent = smtp.__enter__.return_value.send_message.call_args.args[0]
+        self.assertTrue(sent["Subject"].startswith("[DEMO - Chrome Hearts] Back in stock: Ring"))
+
     def test_no_restocks_sends_nothing(self):
         factory = mock.Mock()
         EmailNotifier("h", 465, "u", "p", "s", "r", smtp_factory=factory).send([])
@@ -337,6 +345,18 @@ class ConfigTests(unittest.TestCase):
         with mock.patch.dict("os.environ", {"SMTP_PASSWORD": "code"}, clear=True):
             with self.assertRaises(ConfigError):
                 build_notifier(self.CFG, dry_run=False)
+
+
+class DemoConfigTests(unittest.TestCase):
+    def test_demo_config_is_isolated_and_tagged(self):
+        root = Path(__file__).resolve().parent.parent
+        cfg = load_config(root / "demo" / "config.yaml")
+        self.assertEqual(cfg["_base_dir"], root / "demo")  # state.db lives in demo/, not the root
+        self.assertEqual(cfg["source"]["type"], "mock")
+        env = {"SMTP_PASSWORD": "x", "EMAIL_ADDRESS": "me@gmail.com"}
+        with mock.patch.dict("os.environ", env, clear=True):
+            n = build_notifier(cfg, dry_run=False)
+        self.assertEqual((n.host, n.subject_tag), ("smtp.gmail.com", "DEMO - Chrome Hearts"))
 
 
 class UnreachableTests(unittest.TestCase):
