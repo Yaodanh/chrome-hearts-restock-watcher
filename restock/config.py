@@ -11,6 +11,15 @@ from .sources import MockSource, WebSource
 
 DEFAULT_OUT_OF_STOCK_TEXTS = ["sold out", "out of stock", "notify me when available"]
 
+# Mail domain -> (SMTP server, SSL port)
+KNOWN_SMTP = {
+    "gmail.com": ("smtp.gmail.com", 465),
+    "googlemail.com": ("smtp.gmail.com", 465),
+    "163.com": ("smtp.163.com", 465),
+    "126.com": ("smtp.126.com", 465),
+    "qq.com": ("smtp.qq.com", 465),
+}
+
 
 class ConfigError(Exception):
     pass
@@ -61,15 +70,23 @@ def build_notifier(cfg: dict, dry_run: bool):
         return ConsoleNotifier()
     email = dict(cfg.get("email") or {})
     # EMAIL_ADDRESS (e.g. from a GitHub secret) keeps your address out of a public repo.
-    address = os.environ.get("EMAIL_ADDRESS")
+    address = os.environ.get("EMAIL_ADDRESS", "").strip()
     if address:
         email["username"] = email["recipient"] = address
         email.pop("sender", None)
+        # Pick the mail server from the address, so Gmail and 163 both just work.
+        known = KNOWN_SMTP.get(address.rsplit("@", 1)[-1].lower())
+        if known:
+            email["smtp_host"], email["smtp_port"] = known
+    # Optional: deliver alerts to a different inbox than the sending account.
+    if os.environ.get("ALERT_TO", "").strip():
+        email["recipient"] = os.environ["ALERT_TO"].strip()
     missing = [k for k in ("smtp_host", "username", "recipient")
                if not email.get(k) or email[k] == "you@163.com"]
     if missing:
         raise ConfigError(f"email section is missing: {', '.join(missing)}")
-    password = os.environ.get("SMTP_PASSWORD")
+    # Gmail shows app passwords in groups ("abcd efgh ijkl mnop"); spaces aren't part of it.
+    password = os.environ.get("SMTP_PASSWORD", "").replace(" ", "").strip()
     if not password:
         raise ConfigError("Set the SMTP_PASSWORD environment variable (never put it in config.yaml)")
     return EmailNotifier(

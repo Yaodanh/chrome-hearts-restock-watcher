@@ -1,6 +1,6 @@
 #!/bin/bash
 # One-command start on macOS/Linux:  ./start.sh
-# Sets up Python packages the first time, asks for your 163 authorization code,
+# Sets up Python packages the first time, asks for your email and app password,
 # then checks the store every 20 minutes. Keep this Terminal window open.
 set -e
 cd "$(dirname "$0")"
@@ -13,11 +13,11 @@ fi
 [ -f config.yaml ] || cp config.example.yaml config.yaml
 
 if [ -z "$EMAIL_ADDRESS" ]; then
-  read -r -p "Your 163 email address: " EMAIL_ADDRESS
+  read -r -p "Your email address (Gmail or 163): " EMAIL_ADDRESS
   export EMAIL_ADDRESS
 fi
 if [ -z "$SMTP_PASSWORD" ]; then
-  read -r -s -p "163 SMTP authorization code (授权码): " SMTP_PASSWORD; echo
+  read -r -s -p "Gmail app password / 163 authorization code: " SMTP_PASSWORD; echo
   export SMTP_PASSWORD
 fi
 

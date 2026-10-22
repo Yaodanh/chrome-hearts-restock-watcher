@@ -43,7 +43,7 @@ def build_message(alerts: List[Alert], sender: str, recipient: str) -> EmailMess
 
 
 class EmailNotifier:
-    """SMTP over SSL. Works with 163 mail (authorization code) or Gmail (app password)."""
+    """SMTP over SSL. Works with Gmail (app password) or 163 mail (authorization code)."""
 
     def __init__(self, host: str, port: int, username: str, password: str,
                  sender: str, recipient: str, smtp_factory=smtplib.SMTP_SSL):

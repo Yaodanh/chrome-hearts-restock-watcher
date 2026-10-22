@@ -19,8 +19,12 @@ Every 20 minutes it checks the store and sends one email for each of these event
 
 The first run only records what's on the site (no emails). Each event emails once.
 
-First, in 163 mail settings, turn on SMTP (POP3/SMTP/IMAP) and copy the
-**authorization code (授权码)**. It is not your login password.
+First, get a password the program can send mail with (not your normal login password):
+
+- **Gmail:** turn on 2-Step Verification, then create an app password at
+  https://myaccount.google.com/apppasswords (16 letters).
+- **163 mail:** Settings → POP3/SMTP/IMAP → turn on SMTP and copy the
+  authorization code (授权码).
 
 ## Run 24/7 on GitHub Actions (computer can be off)
 
@@ -30,8 +34,9 @@ Public repositories get Actions minutes for free.
 1. Create a **public** repository on GitHub and upload this whole folder
    (including the hidden `.github` folder).
 2. Repository → Settings → Secrets and variables → Actions → New repository secret:
-   - `EMAIL_ADDRESS` = your 163 address
-   - `SMTP_PASSWORD` = the 163 authorization code
+   - `EMAIL_ADDRESS` = your Gmail (or 163) address
+   - `SMTP_PASSWORD` = the app password / authorization code
+   - `ALERT_TO` (optional) = a different inbox to receive alerts
 3. Actions tab → enable workflows if asked → "Chrome Hearts watcher" → **Run workflow**.
    The first run records a baseline (no email). Open the run's log to check that
    categories show `in_stock` / `out_of_stock`, not all `unknown`.
@@ -51,14 +56,14 @@ Good to know:
 ./start.sh
 ```
 
-It installs packages the first time, asks for your address and authorization code,
+It installs packages the first time, asks for your address and app password,
 and keeps the Mac awake while watching. Leave the Terminal window open.
 
 Useful one-off commands (inside the project folder, after the first `./start.sh`):
 
 ```bash
-export EMAIL_ADDRESS='you@163.com'
-export SMTP_PASSWORD='your-authorization-code'
+export EMAIL_ADDRESS='you@gmail.com'
+export SMTP_PASSWORD='your-app-password'
 .venv/bin/python -m restock --test-email          # send a sample email
 .venv/bin/python -m restock --once --dry-run      # one check, print instead of email
 .venv/bin/python -m unittest discover -s tests -v # run the tests
