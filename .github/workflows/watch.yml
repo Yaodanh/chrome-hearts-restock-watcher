@@ -43,6 +43,7 @@ jobs:
         env:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+          ALERT_TO: ${{ secrets.ALERT_TO }}
         run: |
           cp config.example.yaml config.yaml
           python -m restock --once

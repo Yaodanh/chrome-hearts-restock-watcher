@@ -48,10 +48,11 @@ source:
       variant: {attribute: color, value: WHT}   # BLK, WHT, MB9
 
 email:
-  # 163 mail: turn on SMTP in 163 settings and use the authorization code (授权码)
-  # as SMTP_PASSWORD. It is read from the environment, never from this file.
-  # Your address can also come from the EMAIL_ADDRESS environment variable
-  # (start.sh and the GitHub workflow do this), so it never sits in a public repo.
+  # Normally set by environment variables (GitHub secrets / start.sh), not here:
+  #   EMAIL_ADDRESS  the account that sends (and by default receives) alerts.
+  #                  Gmail, 163, 126 and QQ addresses pick their server automatically.
+  #   SMTP_PASSWORD  Gmail: a 16-letter app password. 163: the authorization code (授权码).
+  #   ALERT_TO       optional: deliver alerts to a different inbox.
   smtp_host: smtp.163.com
   smtp_port: 465
   username: you@163.com

@@ -321,6 +321,18 @@ class ConfigTests(unittest.TestCase):
             n = build_notifier(self.CFG, dry_run=False)
         self.assertEqual((n.username, n.recipient, n.sender), ("me@163.com",) * 3)
 
+    def test_gmail_address_picks_gmail_server(self):
+        env = {"SMTP_PASSWORD": "abcd efgh ijkl mnop", "EMAIL_ADDRESS": "me@gmail.com"}
+        with mock.patch.dict("os.environ", env, clear=True):
+            n = build_notifier(self.CFG, dry_run=False)
+        self.assertEqual((n.host, n.port, n.password), ("smtp.gmail.com", 465, "abcdefghijklmnop"))
+
+    def test_alert_to_overrides_recipient(self):
+        env = {"SMTP_PASSWORD": "x", "EMAIL_ADDRESS": "me@gmail.com", "ALERT_TO": "me@163.com"}
+        with mock.patch.dict("os.environ", env, clear=True):
+            n = build_notifier(self.CFG, dry_run=False)
+        self.assertEqual((n.username, n.recipient), ("me@gmail.com", "me@163.com"))
+
     def test_placeholder_address_is_rejected(self):
         with mock.patch.dict("os.environ", {"SMTP_PASSWORD": "code"}, clear=True):
             with self.assertRaises(ConfigError):
