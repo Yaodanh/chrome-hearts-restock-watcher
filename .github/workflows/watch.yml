@@ -5,7 +5,12 @@ on:
     # Every 20 minutes (times are UTC). Off the hour on purpose: GitHub's
     # scheduler is busiest at :00, and busy schedules start late.
     - cron: "7,27,47 * * * *"
-  workflow_dispatch: {}   # "Run workflow" button for a manual check
+  workflow_dispatch:      # "Run workflow" button for a manual check
+    inputs:
+      test_email:
+        description: "Only send a test email (checks your email settings)"
+        type: boolean
+        default: false
 
 # Never run two checks at once; a late run just waits for the previous one.
 concurrency:
@@ -39,7 +44,18 @@ jobs:
           key: state-${{ github.run_id }}
           restore-keys: state-
 
+      - name: Send a test email
+        if: ${{ inputs.test_email }}
+        env:
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+          ALERT_TO: ${{ secrets.ALERT_TO }}
+        run: |
+          cp config.example.yaml config.yaml
+          python -m restock --test-email
+
       - name: Check the store
+        if: ${{ !inputs.test_email }}
         env:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
