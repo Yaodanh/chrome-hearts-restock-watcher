@@ -1,0 +1,14 @@
+# Config for demo/run.sh: replays one fake restock using mock data.
+# Paths are relative to this folder, so the real state.db is never touched.
+state_db: state.db
+source:
+  type: mock
+  mock_file: stock.json
+email:
+  # Only used without --dry-run. Address and password come from EMAIL_ADDRESS
+  # and SMTP_PASSWORD (GitHub secrets); Gmail/163 servers are picked automatically.
+  subject_tag: "DEMO - Chrome Hearts"
+  smtp_host: smtp.gmail.com
+  smtp_port: 465
+  username: you@163.com
+  recipient: you@163.com
