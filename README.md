@@ -138,7 +138,7 @@ categories + sitemap + menu ──► live category pages ──► product page
   so the alert logic is tested without the real website.
 - **No secrets in files.** The SMTP password only comes from an environment variable.
 
-## Known limitations / next steps
+## Known limitations 
 
 - A 20-minute interval (plus GitHub's scheduling delay) can be too slow for drops
   that sell out in minutes. It's a trade-off between speed and load on the site.
@@ -151,12 +151,3 @@ categories + sitemap + menu ──► live category pages ──► product page
 - If a pop-up uses a brand-new URL that's neither in the sitemap nor the menu, only
   its products would be missed until it appears in one of them.
 
-## How I used AI
-
-<!-- Fill this in yourself, honestly. Interviewers ask about exactly this. -->
-
-- **Tool:** Claude
-- **What I asked it to do:**
-- **What I accepted as-is and why:**
-- **What I changed or rejected:**
-- **How I verified it (tests, running it, reading the code):**
