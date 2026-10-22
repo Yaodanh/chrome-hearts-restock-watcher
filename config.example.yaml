@@ -1,0 +1,58 @@
+# Copy to config.yaml:  cp config.example.yaml config.yaml
+
+state_db: state.db
+
+source:
+  # catalog = watch the whole Chrome Hearts store for pop-ups, new items and restocks
+  # web     = watch a fixed list of product pages (see "products" below)
+  # mock    = local demo data in data/mock_stock.json, no internet needed
+  type: catalog
+
+  base_url: "https://www.chromehearts.com/"
+  user_agent: "restock-watcher/1.0 (personal use)"
+  delay_seconds: 2              # pause between any two requests
+
+  # Category pages to watch. Checked 2026-10-22:
+  #  - live now:   socks, boxers-leggings, intimates, scents, baccarat
+  #  - switched off (redirect to the homepage), i.e. exist and wait for a pop-up:
+  #                hoodies, sweatshirts, pants, hat, scarf, shop
+  #  - guesses (404 today); harmless, and they alert if they ever appear
+  categories:
+    - /hoodies
+    - /sweatshirts
+    - /pants
+    - /hat
+    - /scarf
+    - /shop
+    - /t-shirts
+    - /long-sleeves
+    - /jackets
+    - /denim
+    - /shorts
+    - /socks
+    - /boxers-leggings
+    - /intimates
+    - /scents
+    - /baccarat
+
+  # Also pick up new categories from the sitemap and the homepage menu.
+  discover_categories: true
+  # Open each product page to read real stock (needed for restock alerts).
+  check_product_pages: true
+
+  # --- only for type: web ---
+  products:
+    - id: ch-logo-socks-white
+      name: "CH Logo Socks (White)"
+      url: "https://www.chromehearts.com/socks/ch-logo-socks/176354XXXXXX349.html"
+      variant: {attribute: color, value: WHT}   # BLK, WHT, MB9
+
+email:
+  # 163 mail: turn on SMTP in 163 settings and use the authorization code (授权码)
+  # as SMTP_PASSWORD. It is read from the environment, never from this file.
+  # Your address can also come from the EMAIL_ADDRESS environment variable
+  # (start.sh and the GitHub workflow do this), so it never sits in a public repo.
+  smtp_host: smtp.163.com
+  smtp_port: 465
+  username: you@163.com
+  recipient: you@163.com
