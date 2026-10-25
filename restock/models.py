@@ -14,7 +14,7 @@ class StockStatus(str, Enum):
 
 @dataclass(frozen=True)
 class ProductSnapshot:
-    """What a source saw for one product (or one category page) at one moment."""
+    """A snapshot is a record of what I saw at one moment."""
 
     product_id: str
     name: str
